@@ -4,9 +4,9 @@ pipeline {
 	stages {
 	
 		stage('First Job') {
-			agent {
-				label 'master'
-			}
+			//agent {
+			//	label 'master'
+			//}
 			steps {
 				script {
 					if (( env.BRANCH_NAME == 'master' ) || ( env.BRANCH_NAME == 'develop')) {
