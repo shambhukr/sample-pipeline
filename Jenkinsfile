@@ -1,25 +1,41 @@
 pipeline {
-  //agent { label 'master' }
-   agent none
-	stages {
-	
-		stage('First Job') {
-			agent {
-				label 'master'
-			}
-			steps {
-				script {
-					if (( env.BRANCH_NAME == 'master' ) || ( env.BRANCH_NAME == 'develop')) {
-						// Checkout the branch.
-						//checkout scm
-						println "Branch is ${env.BRANCH_NAME}"
-						bat 'echo hello'
-					}
-					else {
-						println "Not on master or develop branch doing nothing.branch is ${env.BRANCH_NAME}"
-					}
-				}
+		agent {
+		label "master"
+		}
+		
+		parameters {
+			string(defaultValue: "https://github.com/shambhukr/sample-pipeline.git", description: 'RepoUrl', name: 'RepoUrl')
+			string(defaultValue: "sample-seed-job", description: 'ProjectName', name: 'ProjectName')
+       
+		}
+		
+		stages {
+			stage ('Generate seed job') {
+				steps {
+				    
+
+jobDsl scriptText: '''def scmRepo = RepoUrl
+def seedJob = ProjectName
+multibranchPipelineJob(seedJob) {
+		branchSources {
+			git {
+				remote(scmRepo)
+				credentialsId(\'\')
+				includes(\'*\')
 			}
 		}
+		orphanedItemStrategy {
+			discardOldItems {
+				numToKeep(20)
+			}
+		}
+}'''
+
+
+
+					
+				}
+			}
+		}	
 	}
-}
+	
